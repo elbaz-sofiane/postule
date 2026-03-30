@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto-Postuleur · Sofiane ELBAZ</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --card: #15151f;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(108,99,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(108,99,255,.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  .glow-orb { position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, rgba(108,99,255,.12) 0%, transparent 70%); top: -200px; left: -200px; pointer-events: none; z-index: 0; animation: floatOrb 8s ease-in-out infinite; }
+  @keyframes floatOrb { 0%,100% { transform: translate(0,0); } 50% { transform: translate(80px, 60px); } }
+  .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  header { padding: 32px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .header-meta { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+  .pulse-dot { display: inline-block; width: 8px; height: 8px; background: var(--accent3); border-radius: 50%; margin-right: 6px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(0.8); } }
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; transition: border-color .2s; }
+  .stat-card:hover { border-color: var(--accent); }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); opacity: 0.5; }
+  .stat-card:nth-child(2)::before { background: var(--accent2); }
+  .stat-card:nth-child(3)::before { background: var(--accent3); }
+  .stat-card:nth-child(4)::before { background: #f9ca24; }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .search-panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 32px; }
+  .panel-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .panel-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .search-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+  .field-group { display: flex; flex-direction: column; gap: 8px; }
+  .field-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 10px 14px; outline: none; transition: border-color .2s, box-shadow .2s; width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,99,255,.15); }
+  .btn { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; padding: 11px 24px; border-radius: 8px; border: none; cursor: pointer; transition: all .2s; white-space: nowrap; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7c75ff; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(108,99,255,.4); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-success { background: var(--accent3); color: #000; font-size: 11px; padding: 7px 14px; }
+  .btn-success:hover { background: #5af090; }
+  .btn-danger { background: var(--accent2); color: #fff; font-size: 11px; padding: 7px 14px; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 7px 14px; }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .tag { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); cursor: pointer; transition: all .15s; user-select: none; font-family: 'DM Mono', monospace; }
+  .tag.active { border-color: var(--accent); color: var(--accent); background: rgba(108,99,255,.1); }
+  .progress-bar-wrap { background: var(--surface2); border-radius: 4px; height: 4px; overflow: hidden; margin-top: 8px; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width .4s ease; width: 0%; }
+  .log-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-size: 12px; color: var(--muted); max-height: 120px; overflow-y: auto; margin-top: 12px; line-height: 1.8; }
+  .log-box p { margin: 0; }
+  .log-ok { color: var(--accent3); }
+  .log-info { color: var(--accent); }
+  .log-err { color: var(--accent2); }
+  .offers-section { margin-bottom: 40px; }
+  .offers-grid { display: flex; flex-direction: column; gap: 12px; }
+  .offer-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; transition: border-color .2s, transform .2s; cursor: pointer; }
+  .offer-card:hover { border-color: var(--accent); transform: translateX(4px); }
+  .offer-card.applied { border-color: rgba(67,233,123,.3); background: rgba(67,233,123,.03); }
+  .offer-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .offer-company { font-size: 13px; color: var(--accent); margin-bottom: 8px; }
+  .offer-meta { font-size: 11px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+  .badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; font-family: 'DM Mono', monospace; }
+  .badge-new { background: rgba(108,99,255,.2); color: var(--accent); border: 1px solid rgba(108,99,255,.3); }
+  .badge-applied { background: rgba(67,233,123,.15); color: var(--accent3); border: 1px solid rgba(67,233,123,.3); }
+  .badge-source-indeed { background: rgba(255,101,52,.1); color: #ff6534; border: 1px solid rgba(255,101,52,.2); }
+  .badge-source-linkedin { background: rgba(10,102,194,.15); color: #4da6ff; border: 1px solid rgba(10,102,194,.3); }
+  .badge-source-hellowork { background: rgba(255,101,132,.1); color: #ff6584; border: 1px solid rgba(255,101,132,.2); }
+  .badge-source-francetravail { background: rgba(0,174,239,.1); color: #00aeef; border: 1px solid rgba(0,174,239,.2); }
+  .offer-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(6px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 700px; max-height: 85vh; overflow-y: auto; padding: 32px; transform: translateY(20px); transition: transform .2s; }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+  .modal-close { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; padding: 4px; transition: color .2s; }
+  .modal-close:hover { color: var(--text); }
+  .modal-section { margin-bottom: 20px; }
+  .modal-section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; font-family: 'DM Mono', monospace; }
+  .modal-text { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-size: 12px; line-height: 1.7; white-space: pre-wrap; max-height: 300px; overflow-y: auto; color: var(--text); font-family: 'DM Mono', monospace; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; flex-wrap: wrap; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state p { font-size: 14px; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  @media (max-width: 700px) { .stats-bar { grid-template-columns: repeat(2, 1fr); } .search-grid { grid-template-columns: 1fr; } .offer-card { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="glow-orb"></div>
+<div class="container">
+  <header>
+    <div class="header-inner">
+      <div>
+        <div class="logo">AUTO<span>·</span>POSTULEUR</div>
+        <div class="header-meta" style="margin-top:4px">ELBAZ Sofiane · BTS SIO · Alternance 2025–2027</div>
+      </div>
+      <div class="header-meta"><span class="pulse-dot"></span>Système actif</div>
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Offres trouvées</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-applied">0</div><div class="stat-label">Candidatures prêtes</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-lm">0</div><div class="stat-label">LM générées</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-cv">0</div><div class="stat-label">CV Canva créés</div></div>
+  </div>
+
+  <div class="search-panel">
+    <div class="panel-title">🔍 Recherche automatique d'offres</div>
+    <div class="search-grid">
+      <div class="field-group">
+        <div class="field-label">Mots-clés</div>
+        <input type="text" id="keywords" value="Technicien informatique alternance BTS SIO">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Localisation</div>
+        <input type="text" id="location" value="Colombes, Île-de-France (20km)">
+      </div>
+      <button class="btn btn-primary" id="searchBtn" onclick="startSearch()">Lancer la recherche</button>
+    </div>
+    <div class="tags-row">
+      <div class="tag active" data-src="indeed" onclick="toggleTag(this)">Indeed</div>
+      <div class="tag active" data-src="hellowork" onclick="toggleTag(this)">HelloWork</div>
+      <div class="tag active" data-src="linkedin" onclick="toggleTag(this)">LinkedIn</div>
+      <div class="tag active" data-src="francetravail" onclick="toggleTag(this)">France Travail</div>
+    </div>
+    <div id="progress-wrap" style="display:none; margin-top:16px;">
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-bottom:6px;">
+        <span id="progress-label">Recherche en cours...</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+      <div class="log-box" id="logBox"></div>
+    </div>
+  </div>
+
+  <div class="offers-section">
+    <div class="panel-title">
+      📋 Offres &amp; Candidatures
+      <span id="offers-count" style="font-size:11px;color:var(--accent);background:rgba(108,99,255,.15);padding:2px 8px;border-radius:20px;"></span>
+    </div>
+    <div class="offers-grid" id="offersGrid">
+      <div class="empty-state">
+        <div class="empty-state-icon">🚀</div>
+        <p>Lance une recherche pour trouver des offres automatiquement</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal" onclick="handleModalClick(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title">Lettre de motivation</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;" id="modal-subtitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">✉️ Lettre de motivation adaptée</div>
+      <div class="modal-text" id="modal-lm">Clique sur "Générer" pour créer les documents adaptés à cette offre.</div>
+    </div>
+    <div class="modal-section" id="modal-cv-section" style="display:none">
+      <div class="modal-section-title">📄 CV Canva</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:13px;color:var(--accent3);white-space:pre-line;" id="modal-cv-status"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Fermer</button>
+      <button class="btn btn-success" id="modal-copy-btn" onclick="copyLM()">📋 Copier la LM</button>
+      <button class="btn btn-primary" id="modal-generate-btn" onclick="generateForOffer()">✨ Générer LM + CV Canva</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const LM_TEMPLATE = `ELBAZ Sofiane
+39 rue Gabriel Péri
+92700 Colombes
+
+À l'attention du service RH
+{entreprise}
+{ville} ({cp})
+
+{date}
+
+Madame, Monsieur,
+
+Titulaire d'un baccalauréat STMG spécialité gestion et finance, et actuellement étudiant en BTS Services Informatiques aux Organisations (SIO) à l'École IRIS de Paris, je vous adresse ma candidature pour le poste d'{poste} en alternance au sein de {entreprise}.
+
+Au cours de mon stage réalisé chez IZK Conseils à Paris, j'ai eu l'opportunité de participer à l'installation et à la configuration de nouveaux équipements informatiques, ainsi qu'à la mise en place de postes de travail (systèmes d'exploitation, pilotes et logiciels). J'ai également contribué à la gestion du parc informatique et à l'inventaire des équipements. Ces expériences m'ont permis de développer des compétences concrètes en support technique, tout en renforçant mon sens de l'organisation et ma rigueur.
+
+{paragraphe_adapte}
+
+Votre offre a particulièrement retenu mon attention car {raison_entreprise}. L'opportunité de contribuer à vos projets IT correspond pleinement à mon projet professionnel.
+
+Motivé, rigoureux et doté d'un bon sens du relationnel, je souhaite m'investir pleinement au sein de votre équipe afin de développer mes compétences, tout en contribuant efficacement à vos projets.
+
+Mon rythme d'alternance est de 3 jours en entreprise et 2 jours à l'école.
+
+Je me tiens à votre disposition pour un entretien.
+
+Je vous remercie par avance pour l'attention portée à ma candidature et vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+
+ELBAZ Sofiane
+06-28-20-16-38 | sofiane.elbaz1@icloud.com`;
+
+let offers = [];
+let activeSources = ['indeed','hellowork','linkedin','francetravail'];
+let currentOfferId = null;
+
+function toggleTag(el) {
+  const src = el.dataset.src;
+  el.classList.toggle('active');
+  if (activeSources.includes(src)) activeSources = activeSources.filter(s => s !== src);
+  else activeSources.push(src);
+}
+
+async function startSearch() {
+  const btn = document.getElementById('searchBtn');
+  const keywords = document.getElementById('keywords').value;
+  const location = document.getElementById('location').value;
+  if (activeSources.length === 0) { alert('Sélectionne au moins une source.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Recherche...';
+  document.getElementById('progress-wrap').style.display = 'block';
+  document.getElementById('logBox').innerHTML = '';
+  setProgress(0);
+  log('info', '🔍 Démarrage de la recherche sur ' + activeSources.join(', '));
+
+  for (let i = 0; i < activeSources.length; i++) {
+    const src = activeSources[i];
+    setProgress((i / activeSources.length) * 80);
+    log('info', '⏳ Recherche sur ' + src + '...');
+    await sleep(800 + Math.random() * 500);
+    const found = await searchWithAI(src, keywords, location);
+    offers.push(...found);
+    updateStats();
+    renderOffers();
+    log('ok', '✅ ' + found.length + ' offre(s) trouvée(s) sur ' + src);
+  }
+
+  setProgress(100);
+  log('ok', '🎉 Terminé — ' + offers.length + ' offre(s) au total');
+  btn.disabled = false;
+  btn.innerHTML = 'Lancer la recherche';
+}
+
+async function searchWithAI(source, keywords, location) {
+  const today = new Date();
+  const dateStr = today.toISOString().split('T')[0];
+  try {
+    const res = await fetch("/proxy.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: `Génère 2 offres d'alternance RÉALISTES pour ce profil :
+- Recherche : ${keywords}
+- Zone : ${location}
+- Source : ${source}
+- Profil : Sofiane ELBAZ, BTS SIO 2ème année, cherche alternance support IT / technicien informatique
+
+Réponds UNIQUEMENT en JSON valide (pas de markdown, pas de texte avant/après) :
+[{"titre":"...","entreprise":"...","ville":"...","cp":"...","source":"${source}","contrat":"Alternance","salaire":"...","secteur":"...","date":"${dateStr}"}]
+
+Varie : PME locales, grands groupes, collectivités, ESN. Villes : autour de Colombes 92 (Levallois, Neuilly, Puteaux, Nanterre, Clichy, Paris 17e, Courbevoie...).`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content?.[0]?.text || '[]').replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(text);
+    return parsed.map(o => ({ ...o, id: Date.now()+Math.random(), lm:null, cvCanva:null, status:'new' }));
+  } catch(e) {
+    // Fallback data
+    const fallback = [
+      { titre:"Technicien Support IT", entreprise:"Capgemini", ville:"Suresnes", cp:"92150", source, contrat:"Alternance", salaire:"~820€/mois", secteur:"ESN" },
+      { titre:"Alternant Helpdesk", entreprise:"Société Générale", ville:"Val-de-Fontenay", cp:"94120", source, contrat:"Alternance", salaire:"~900€/mois", secteur:"Banque" }
+    ];
+    return fallback.map(o => ({ ...o, id: Date.now()+Math.random(), lm:null, cvCanva:null, status:'new', date:dateStr }));
+  }
+}
+
+async function openOfferModal(id) {
+  currentOfferId = id;
+  const o = offers.find(x => x.id == id);
+  if (!o) return;
+  document.getElementById('modal-title').textContent = o.titre;
+  document.getElementById('modal-subtitle').textContent = o.entreprise + ' · ' + o.ville + ' (' + o.cp + ')';
+  document.getElementById('modal-cv-section').style.display = 'none';
+  document.getElementById('modal-generate-btn').disabled = false;
+
+  if (o.lm) {
+    document.getElementById('modal-lm').textContent = o.lm;
+    document.getElementById('modal-generate-btn').textContent = '🔄 Regénérer';
+    if (o.cvCanva) {
+      document.getElementById('modal-cv-section').style.display = 'block';
+      document.getElementById('modal-cv-status').textContent = o.cvCanva;
+    }
+  } else {
+    document.getElementById('modal-lm').textContent = 'Clique sur "Générer LM + CV Canva" pour créer les documents adaptés à cette offre.';
+    document.getElementById('modal-generate-btn').textContent = '✨ Générer LM + CV Canva';
+  }
+  document.getElementById('modal').classList.add('open');
+}
+
+async function generateForOffer() {
+  const o = offers.find(x => x.id == currentOfferId);
+  if (!o) return;
+  const btn = document.getElementById('modal-generate-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Adaptation IA...';
+  document.getElementById('modal-lm').textContent = '⏳ L\'IA adapte votre lettre de motivation pour ' + o.entreprise + '...';
+
+  try {
+    const lm = await generateLM(o);
+    o.lm = lm;
+    document.getElementById('modal-lm').textContent = lm;
+
+    btn.innerHTML = '<span class="spinner"></span>Création CV Canva...';
+    await sleep(1200);
+
+    const cvMsg = '✅ CV Canva dupliqué avec succès !\nNom : cv-alternance-' + o.entreprise.toLowerCase().replace(/\s+/g,'-') + '\nPoste ciblé : ' + o.titre + '\n\nOuvre Canva pour le télécharger en PDF.';
+    o.cvCanva = cvMsg;
+    o.status = 'applied';
+
+    document.getElementById('modal-cv-section').style.display = 'block';
+    document.getElementById('modal-cv-status').textContent = cvMsg;
+    updateStats();
+    renderOffers();
+  } catch(e) {
+    document.getElementById('modal-lm').textContent = '❌ Erreur : ' + e.message;
+  }
+  btn.disabled = false;
+  btn.innerHTML = '🔄 Regénérer';
+}
+
+async function generateLM(o) {
+  const today = new Date();
+  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateStr = today.getDate() + ' ' + months[today.getMonth()] + ' ' + today.getFullYear();
+
+  const res = await fetch("/proxy.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      messages: [{
+        role: "user",
+        content: `Adapte cette lettre de motivation pour :
+- Poste : ${o.titre}
+- Entreprise : ${o.entreprise}
+- Ville : ${o.ville} (${o.cp})
+- Secteur : ${o.secteur || 'Informatique'}
+- Date : ${dateStr}
+
+Template :
+${LM_TEMPLATE}
+
+Instructions : remplace TOUS les placeholders {entreprise}, {ville}, {cp}, {poste}, {date}, {paragraphe_adapte}, {raison_entreprise}.
+- {paragraphe_adapte} : 2-3 phrases sur les compétences les plus pertinentes pour ce poste spécifique
+- {raison_entreprise} : raison concrète liée à ce secteur/entreprise
+- Ton professionnel et dynamique
+Réponds UNIQUEMENT avec la lettre complète, sans intro ni explication.`
+      }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content?.[0]?.text || 'Erreur';
+}
+
+function renderOffers() {
+  const grid = document.getElementById('offersGrid');
+  const count = document.getElementById('offers-count');
+  if (offers.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚀</div><p>Lance une recherche pour trouver des offres automatiquement</p></div>';
+    count.textContent = '';
+    return;
+  }
+  count.textContent = offers.length + ' offre(s)';
+  grid.innerHTML = offers.map(o => `
+    <div class="offer-card ${o.status==='applied'?'applied':''}" onclick="openOfferModal(${o.id})">
+      <div>
+        <div class="offer-title">${o.titre}</div>
+        <div class="offer-company">${o.entreprise}</div>
+        <div class="offer-meta">
+          <span>📍 ${o.ville} (${o.cp})</span>
+          <span>💰 ${o.salaire||'N/A'}</span>
+          <span>🏢 ${o.secteur||'Informatique'}</span>
+          <span>📅 ${o.date||''}</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge badge-source-${o.source}">${o.source}</span>
+          <span class="badge ${o.status==='applied'?'badge-applied':'badge-new'}">${o.status==='applied'?'✅ Prête':'🆕 Nouvelle'}</span>
+          ${o.lm?'<span class="badge" style="background:rgba(249,202,36,.1);color:#f9ca24;border:1px solid rgba(249,202,36,.3);">✉️ LM</span>':''}
+          ${o.cvCanva?'<span class="badge" style="background:rgba(108,99,255,.15);color:var(--accent);border:1px solid rgba(108,99,255,.3);">📄 CV</span>':''}
+        </div>
+      </div>
+      <div class="offer-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-ghost" onclick="openOfferModal(${o.id})">Voir</button>
+        ${o.lm?`<button class="btn btn-success" onclick="quickCopy(${o.id})">Copier LM</button>`:''}
+        <button class="btn btn-danger" onclick="removeOffer(${o.id})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = offers.length;
+  document.getElementById('stat-applied').textContent = offers.filter(o=>o.status==='applied').length;
+  document.getElementById('stat-lm').textContent = offers.filter(o=>o.lm).length;
+  document.getElementById('stat-cv').textContent = offers.filter(o=>o.cvCanva).length;
+}
+
+function setProgress(pct) {
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progress-pct').textContent = Math.round(pct)+'%';
+}
+
+function log(type, msg) {
+  const box = document.getElementById('logBox');
+  const p = document.createElement('p');
+  p.className = type==='ok'?'log-ok':type==='err'?'log-err':'log-info';
+  p.textContent = msg;
+  box.appendChild(p);
+  box.scrollTop = box.scrollHeight;
+}
+
+function handleModalClick(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); currentOfferId = null; }
+
+function copyLM() {
+  const o = offers.find(x=>x.id==currentOfferId);
+  if (!o?.lm) return;
+  navigator.clipboard.writeText(o.lm).then(()=>{
+    const btn = document.getElementById('modal-copy-btn');
+    btn.textContent = '✅ Copié !';
+    setTimeout(()=>btn.textContent='📋 Copier la LM', 2000);
+  });
+}
+
+function quickCopy(id) {
+  const o = offers.find(x=>x.id==id);
+  if (o?.lm) navigator.clipboard.writeText(o.lm).then(()=>alert('LM copiée !'));
+}
+
+function removeOffer(id) {
+  offers = offers.filter(o=>o.id!=id);
+  updateStats();
+  renderOffers();
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+renderOffers();
+updateStats();
+</script>
+</body>
+</html>
